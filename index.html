@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LOVE</title>
+<title>Love</title>
 <style>
   html, body {
     margin: 0;
@@ -101,8 +101,12 @@ let W, H, points, animationId, lastTime;
 function resize() {
   W = window.innerWidth;
   H = window.innerHeight;
-  canvas.width = W;
-  canvas.height = H;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 window.addEventListener('resize', resize);
 resize();
