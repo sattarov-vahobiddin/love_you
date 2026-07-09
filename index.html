@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LOVE YOU</title>
+<title>LOVE</title>
 <style>
   html, body {
     margin: 0;
@@ -107,10 +107,15 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+let heartScale = 10;
+
 function heartPoints() {
   const pts = [];
   const cx = W / 2, cy = H / 2;
-  const scale = Math.min(W, H) / 45;
+  // Heart curve spans roughly 32 units wide, 26 units tall.
+  // Fit it inside the screen with padding, using whichever dimension is tighter.
+  const scale = Math.min((W * 0.85) / 32, (H * 0.85) / 26);
+  heartScale = scale;
 
   function heartXY(t, s) {
     const x = 16 * Math.pow(Math.sin(t), 3);
@@ -118,8 +123,13 @@ function heartPoints() {
     return { x: cx + x * scale * s, y: cy + y * scale * s };
   }
 
-  for (let i = 0; i < 180; i++) {
-    const t = (i / 180) * Math.PI * 2;
+  // On smaller screens, reduce point density so text doesn't overlap.
+  const density = Math.max(0.5, Math.min(1, W / 600));
+  const outerCount = Math.round(180 * density);
+  const innerCount = Math.round(80 * density);
+
+  for (let i = 0; i < outerCount; i++) {
+    const t = (i / outerCount) * Math.PI * 2;
     const p = heartXY(t, 1);
     pts.push({
       x: p.x, y: p.y,
@@ -130,8 +140,8 @@ function heartPoints() {
   }
 
   [0.2, 0.4, 0.6, 0.8].forEach(s => {
-    for (let i = 0; i < 80; i++) {
-      const t = (i / 80) * Math.PI * 2;
+    for (let i = 0; i < innerCount; i++) {
+      const t = (i / innerCount) * Math.PI * 2;
       const p = heartXY(t, s);
       pts.push({
         x: p.x, y: p.y,
@@ -160,7 +170,8 @@ function draw(now) {
 
   ctx.fillStyle = `rgb(${BG[0]}, ${BG[1]}, ${BG[2]})`;
   ctx.fillRect(0, 0, W, H);
-  ctx.font = "13px Consolas, monospace";
+  const fontSize = Math.max(7, Math.min(13, heartScale * 0.6));
+  ctx.font = `${fontSize}px Consolas, monospace`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
